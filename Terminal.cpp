@@ -4,14 +4,13 @@ using namespace std;
 
 
 	bool Terminal(string prompt = "none"){
-		if(prompt == "none"){
+		if(prompt == "none" || !prompt.rfind(":",0)){
 
 
 			return false;
 		}
-	
 		
-	
+		cout << R"(What is your Command:)";	
 
 		return true;	
 	}
@@ -30,9 +29,7 @@ using namespace std;
    | | ___ _ __ _ __ ___  _ _ __   __ _| | | |  __  __ _ _ __ ___   ___
    | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | | | | |_ |/ _` | '_ ` _ \ / _ \
    | |  __/ |  | | | | | | | | | | (_| | | | |__| | (_| | | | | | |  __/
-   |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_|  \_____|\__,_|_| |_| |_|\___|
-
-	 )";
+   |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_|  \_____|\__,_|_| |_| |_|\___|)" <<	std::endl;
 
 
 	cin >> command;
