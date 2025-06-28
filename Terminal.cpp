@@ -12,12 +12,12 @@ bool GameState = true;
 		if(prompt == "none" || prompt.rfind(":",0)){
 
             cout << "Invalid command. Type 'exit' or 'quit' to exit, or type : to type a real command" << endl;
-			return false;
+
 		}
 		
 		cout << R"(What is your Command:)";	
         cin >> prompt;
-		return true;	
+        return true;	
 	}
 
 
@@ -44,7 +44,7 @@ bool GameState = true;
      
    
     if(!GameState){
-    cout << "Exiting terminal..." << endl;
+     cout << "Exiting terminal..." << endl;
     GameState = false;
     return 0;
 
