@@ -1,0 +1,23 @@
+{
+  "name": "terminal",
+  "version": "1.0.0",
+  "description": "\"# Terminal\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wfogame/Terminal.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wfogame/Terminal/issues"
+  },
+  "homepage": "https://github.com/wfogame/Terminal#readme",
+  "dependencies": {
+    "@dwmkerr/terminal-ai": "^0.14.0"
+  }
+}
