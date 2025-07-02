@@ -3,9 +3,557 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Don't Hack me</title>
+    <title>Terminal Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0c0c0c;
+            font-family: 'Courier New', monospace;
+            color: #00ff00;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .terminal-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            border: 2px solid #333;
+        }
+
+        .terminal-header {
+            background: #1e1e1e;
+            padding: 10px 15px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .terminal-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .btn.close { background: #ff5f57; }
+        .btn.minimize { background: #ffbd2e; }
+        .btn.maximize { background: #28ca42; }
+
+        .terminal-title {
+            color: #888;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .terminal-output {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: rgba(0, 255, 0, 0.02);
+            backdrop-filter: blur(1px);
+        }
+
+        .terminal-line {
+            margin-bottom: 8px;
+            animation: typewriter 0.5s ease-in;
+        }
+
+        .prompt {
+            color: #00ccff;
+            text-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+        }
+
+        .command {
+            color: #ffff00;
+            text-shadow: 0 0 8px rgba(255, 255, 0, 0.3);
+        }
+
+        .output {
+            color: #00ff00;
+            margin-left: 0;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+        }
+
+        .error {
+            color: #ff4444;
+            text-shadow: 0 0 8px rgba(255, 68, 68, 0.4);
+        }
+
+        .warning {
+            color: #ffaa00;
+            text-shadow: 0 0 8px rgba(255, 170, 0, 0.4);
+        }
+
+        .terminal-input-container {
+            padding: 15px 20px;
+            background: #111;
+            border-top: 1px solid #333;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-prompt {
+            color: #00ccff;
+            margin-right: 10px;
+            text-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+        }
+
+        .terminal-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            outline: none;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background: #00ff00;
+            animation: blink 1s infinite;
+            margin-left: 2px;
+        }
+
+        .stats-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #333;
+            padding: 15px;
+            border-radius: 5px;
+            backdrop-filter: blur(10px);
+            min-width: 200px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: #00ff00;
+            font-size: 12px;
+        }
+
+        .stat-label {
+            color: #888;
+        }
+
+        .stat-value {
+            color: #00ffff;
+            font-weight: bold;
+        }
+
+        .health-bar, .energy-bar {
+            width: 100%;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff4444, #ff8888);
+            transition: width 0.3s ease;
+        }
+
+        .energy-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4444ff, #8888ff);
+            transition: width 0.3s ease;
+        }
+
+        @keyframes typewriter {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .connection-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .connected {
+            background: rgba(40, 202, 66, 0.2);
+            border: 1px solid #28ca42;
+            color: #28ca42;
+        }
+
+        .disconnected {
+            background: rgba(255, 95, 87, 0.2);
+            border: 1px solid #ff5f57;
+            color: #ff5f57;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
 </head>
 <body>
-    <h1>Test subject don't y ou think it looks good</h1>
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <div class="terminal-buttons">
+                <div class="btn close"></div>
+                <div class="btn minimize"></div>
+                <div class="btn maximize"></div>
+            </div>
+            <div class="terminal-title">Terminal Game v1.0 - Connected to Backend</div>
+        </div>
+        
+        <div class="terminal-output" id="output"></div>
+        
+        <div class="terminal-input-container">
+            <span class="input-prompt">player@game:~$</span>
+            <input type="text" class="terminal-input" id="commandInput" autocomplete="off">
+            <span class="cursor"></span>
+        </div>
+    </div>
+
+    <div class="stats-panel">
+        <div class="stat-item">
+            <span class="stat-label">Health:</span>
+            <span class="stat-value" id="health">100</span>
+        </div>
+        <div class="health-bar">
+            <div class="health-fill" id="healthBar" style="width: 100%"></div>
+        </div>
+        
+        <div class="stat-item">
+            <span class="stat-label">Energy:</span>
+            <span class="stat-value" id="energy">100</span>
+        </div>
+        <div class="energy-bar">
+            <div class="energy-fill" id="energyBar" style="width: 100%"></div>
+        </div>
+        
+        <div class="stat-item">
+            <span class="stat-label">Level:</span>
+            <span class="stat-value" id="level">1</span>
+        </div>
+        
+        <div class="stat-item">
+            <span class="stat-label">Score:</span>
+            <span class="stat-value" id="score">0</span>
+        </div>
+    </div>
+
+    <div class="connection-status connected" id="connectionStatus">
+        <div class="status-dot" style="background: #28ca42;"></div>
+        <span>Backend Connected</span>
+    </div>
+
+    <script>
+        class TerminalGame {
+            constructor() {
+                this.output = document.getElementById('output');
+                this.input = document.getElementById('commandInput');
+                this.gameState = {
+                    health: 100,
+                    energy: 100,
+                    level: 1,
+                    score: 0,
+                    inventory: [],
+                    location: "starting_room"
+                };
+                
+                this.commands = {
+                    'help': this.showHelp.bind(this),
+                    'status': this.showStatus.bind(this),
+                    'look': this.lookAround.bind(this),
+                    'attack': this.attack.bind(this),
+                    'heal': this.heal.bind(this),
+                    'inventory': this.showInventory.bind(this),
+                    'move': this.move.bind(this),
+                    'clear': this.clearScreen.bind(this),
+                    'backend': this.testBackend.bind(this)
+                };
+
+                this.setupEventListeners();
+                this.initializeGame();
+            }
+
+            setupEventListeners() {
+                this.input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.processCommand(e.target.value);
+                        e.target.value = '';
+                    }
+                });
+
+                // Focus input when clicking anywhere
+                document.addEventListener('click', () => {
+                    this.input.focus();
+                });
+            }
+
+            initializeGame() {
+                this.addOutput('=== TERMINAL GAME INITIALIZED ===', 'output');
+                this.addOutput('Welcome to the Terminal Adventure Game!', 'output');
+                this.addOutput('Type "help" to see available commands.', 'output');
+                this.addOutput('Your quest begins now...', 'output');
+                this.addOutput('', 'output');
+                this.input.focus();
+            }
+
+            addOutput(text, className = 'output') {
+                const line = document.createElement('div');
+                line.className = `terminal-line ${className}`;
+                line.textContent = text;
+                this.output.appendChild(line);
+                this.output.scrollTop = this.output.scrollHeight;
+            }
+
+            processCommand(command) {
+                // Show the command being executed
+                this.addOutput(`player@game:~$ ${command}`, 'command');
+                
+                const parts = command.toLowerCase().trim().split(' ');
+                const cmd = parts[0];
+                const args = parts.slice(1);
+
+                if (this.commands[cmd]) {
+                    this.commands[cmd](args);
+                } else if (command.trim() === '') {
+                    // Do nothing for empty commands
+                } else {
+                    this.addOutput(`Command not found: ${cmd}`, 'error');
+                    this.addOutput('Type "help" for available commands.', 'output');
+                }
+
+                // Send command to backend (simulated)
+                this.sendToBackend(command, args);
+            }
+
+            async sendToBackend(command, args) {
+                try {
+                    // This is where you'd make your actual backend request
+                    // For now, we'll simulate it
+                    const response = await this.simulateBackendCall(command, args);
+                    this.handleBackendResponse(response);
+                } catch (error) {
+                    console.error('Backend communication error:', error);
+                    this.updateConnectionStatus(false);
+                }
+            }
+
+            // Simulate backend communication (replace with actual fetch to your C++ backend)
+            async simulateBackendCall(command, args) {
+                // Simulate network delay
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // This is where you'd do:
+                // const response = await fetch('http://localhost:8080/command', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify({ command, args, gameState: this.gameState })
+                // });
+                // return await response.json();
+
+                return {
+                    success: true,
+                    message: `Backend processed: ${command}`,
+                    stateChanges: this.getRandomStateChange()
+                };
+            }
+
+            getRandomStateChange() {
+                const changes = {};
+                if (Math.random() < 0.3) {
+                    changes.health = Math.max(0, this.gameState.health - Math.floor(Math.random() * 10));
+                }
+                if (Math.random() < 0.2) {
+                    changes.energy = Math.max(0, this.gameState.energy - Math.floor(Math.random() * 15));
+                }
+                if (Math.random() < 0.1) {
+                    changes.score = this.gameState.score + Math.floor(Math.random() * 50);
+                }
+                return changes;
+            }
+
+            handleBackendResponse(response) {
+                if (response.stateChanges) {
+                    Object.assign(this.gameState, response.stateChanges);
+                    this.updateUI();
+                }
+            }
+
+            updateUI() {
+                document.getElementById('health').textContent = this.gameState.health;
+                document.getElementById('energy').textContent = this.gameState.energy;
+                document.getElementById('level').textContent = this.gameState.level;
+                document.getElementById('score').textContent = this.gameState.score;
+                
+                document.getElementById('healthBar').style.width = `${this.gameState.health}%`;
+                document.getElementById('energyBar').style.width = `${this.gameState.energy}%`;
+            }
+
+            updateConnectionStatus(connected) {
+                const status = document.getElementById('connectionStatus');
+                if (connected) {
+                    status.className = 'connection-status connected';
+                    status.innerHTML = '<div class="status-dot" style="background: #28ca42;"></div><span>Backend Connected</span>';
+                } else {
+                    status.className = 'connection-status disconnected';
+                    status.innerHTML = '<div class="status-dot" style="background: #ff5f57;"></div><span>Backend Disconnected</span>';
+                }
+            }
+
+            // Game Commands
+            showHelp() {
+                this.addOutput('Available commands:', 'output');
+                this.addOutput('  help     - Show this help message', 'output');
+                this.addOutput('  status   - Show player status', 'output');
+                this.addOutput('  look     - Look around current area', 'output');
+                this.addOutput('  attack   - Attack nearby enemies', 'output');
+                this.addOutput('  heal     - Restore health', 'output');
+                this.addOutput('  inventory- Show your items', 'output');
+                this.addOutput('  move <direction> - Move in a direction', 'output');
+                this.addOutput('  backend  - Test backend connection', 'output');
+                this.addOutput('  clear    - Clear the screen', 'output');
+            }
+
+            showStatus() {
+                this.addOutput('=== PLAYER STATUS ===', 'output');
+                this.addOutput(`Health: ${this.gameState.health}/100`, 'output');
+                this.addOutput(`Energy: ${this.gameState.energy}/100`, 'output');
+                this.addOutput(`Level: ${this.gameState.level}`, 'output');
+                this.addOutput(`Score: ${this.gameState.score}`, 'output');
+                this.addOutput(`Location: ${this.gameState.location}`, 'output');
+            }
+
+            lookAround() {
+                const locations = {
+                    starting_room: "You are in a dimly lit room. There are doors to the north and east.",
+                    forest: "You are in a dark forest. Strange sounds echo around you.",
+                    dungeon: "You are in a cold dungeon. Water drips from the ceiling."
+                };
+                
+                this.addOutput(locations[this.gameState.location] || "You are in an unknown location.", 'output');
+            }
+
+            attack() {
+                if (this.gameState.energy < 10) {
+                    this.addOutput("You don't have enough energy to attack!", 'error');
+                    return;
+                }
+                
+                this.gameState.energy -= 10;
+                const damage = Math.floor(Math.random() * 20) + 10;
+                this.addOutput(`You attack for ${damage} damage!`, 'output');
+                this.addOutput("The enemy strikes back!", 'warning');
+                this.gameState.health -= Math.floor(Math.random() * 15) + 5;
+                this.gameState.score += damage;
+                
+                if (this.gameState.health <= 0) {
+                    this.addOutput("You have been defeated!", 'error');
+                    this.gameState.health = 0;
+                }
+                
+                this.updateUI();
+            }
+
+            heal() {
+                if (this.gameState.energy < 20) {
+                    this.addOutput("You don't have enough energy to heal!", 'error');
+                    return;
+                }
+                
+                this.gameState.energy -= 20;
+                const healing = Math.floor(Math.random() * 30) + 20;
+                this.gameState.health = Math.min(100, this.gameState.health + healing);
+                this.addOutput(`You heal for ${healing} health points.`, 'output');
+                this.updateUI();
+            }
+
+            showInventory() {
+                if (this.gameState.inventory.length === 0) {
+                    this.addOutput("Your inventory is empty.", 'output');
+                } else {
+                    this.addOutput("=== INVENTORY ===", 'output');
+                    this.gameState.inventory.forEach(item => {
+                        this.addOutput(`- ${item}`, 'output');
+                    });
+                }
+            }
+
+            move(args) {
+                if (args.length === 0) {
+                    this.addOutput("Move where? Try: move north, move east, etc.", 'error');
+                    return;
+                }
+                
+                const direction = args[0];
+                this.addOutput(`You move ${direction}...`, 'output');
+                
+                // Simple location changes
+                const locations = ['starting_room', 'forest', 'dungeon', 'castle', 'cave'];
+                this.gameState.location = locations[Math.floor(Math.random() * locations.length)];
+                
+                this.lookAround();
+                this.updateUI();
+            }
+
+            testBackend() {
+                this.addOutput("Testing backend connection...", 'output');
+                this.addOutput("In a real implementation, this would:", 'output');
+                this.addOutput("1. Send HTTP request to your C++ backend", 'output');
+                this.addOutput("2. Backend processes game logic", 'output');
+                this.addOutput("3. Backend returns updated game state", 'output');
+                this.addOutput("4. Frontend updates UI with new values", 'output');
+                this.addOutput("", 'output');
+                this.addOutput("Backend URL would be something like:", 'warning');
+                this.addOutput("POST http://localhost:8080/command", 'warning');
+            }
+
+            clearScreen() {
+                this.output.innerHTML = '';
+                this.addOutput('Screen cleared.', 'output');
+            }
+        }
+
+        // Initialize the game when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            new TerminalGame();
+        });
+    </script>
 </body>
 </html>
